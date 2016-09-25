@@ -19,6 +19,7 @@ data Exp =
     deriving Show
 data Symbol =
     Special String
+  | BuildIn String
   | Variable String
     deriving Show
 data Val =
