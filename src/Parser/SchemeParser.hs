@@ -16,7 +16,7 @@ toAST (Plain exp) = createPlainAST exp
 toAST (Quote exp) = createQuoteAST exp
 
 createPlainAST :: Exp -> AST
-createPlainAST (Exps ((Plain (SymbolExp (Variable s))):args)) = createArithmeticAST s args
+createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) = createArithmeticAST s args
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
 
