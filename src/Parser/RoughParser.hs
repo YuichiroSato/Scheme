@@ -8,6 +8,7 @@ import Text.Parsec.Combinator(many1)
 import Text.Parsec.Prim(try)
 import Data.ParseTree(ParseTree(..), Exp(..), Symbol(..), Val(..))
 import Parser.SpecialForms(isSpecialForm)
+import Parser.BuildInFunctions(isBuildIn)
 
 parseRough :: String -> Either ParseError ParseTree
 parseRough = parse top ""
@@ -59,9 +60,9 @@ parseVal = ValExp <$> (try $ (try parseDouble) <|> (try parseInt) <|> parseStrin
 parseSymbol :: Parsec String () Exp
 parseSymbol =  makeExp <$> symbolParser
   where
-    makeExp v = if isSpecialForm v
-                  then SymbolExp $ Special v
-                  else SymbolExp $ Variable v
+    makeExp v | isSpecialForm v = SymbolExp $ Special v
+    makeExp v | isBuildIn v = SymbolExp $ BuildIn v
+    makeExp v = SymbolExp $ Variable v
 
 symbolParser :: Parsec String () String
 symbolParser = many1 $ noneOf "( )"
