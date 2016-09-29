@@ -2,22 +2,32 @@ module Parser.BuildInFunctions
   ( isBuildIn ) where
 
 buildInFunctions :: [String]
-buildInFunctions =
+buildInFunctions = arithmeticFunctions ++ comparisionFunctions ++ listOperators
+
+arithmeticFunctions :: [String]
+arithmeticFunctions =
   [ "+"
   , "-"
   , "*"
   , "/"
-  , "mod"
-  , "<"
+  , "mod"]
+ 
+comparisionFunctions :: [String]
+conparisionFunctions =
+  [ "<"
   , ">"
   , "<="
   , ">="
-  , "="
-  , "cons"
+  , "="]
+
+listOperators :: [String]
+listOperators =
+  [ "cons"
   , "list"
   , "car"
   , "cdr"
   , "null?"]
+
 
 isBuildIn :: String -> Bool
 isBuildIn str = elem str buildInFunctions 
