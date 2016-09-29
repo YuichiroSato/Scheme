@@ -3,6 +3,7 @@ module Parser.SchemeParser
 
 import Data.AST(AST(..), ArithmeticArgs(..), ValArgs(..))
 import Data.ParseTree(ParseTree(..), Exp(..), Symbol(..), Val(..))
+import Parser.BuildInFunctions(isArithmeticFunction)
 import Parser.RoughParser(parseRough)
 import Text.Parsec(ParseError)
 
@@ -16,7 +17,7 @@ toAST (Plain exp) = createPlainAST exp
 toAST (Quote exp) = createQuoteAST exp
 
 createPlainAST :: Exp -> AST
-createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) = createArithmeticAST s args
+createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isArithmeticFunction s = createArithmeticAST s args
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
 
