@@ -2,14 +2,15 @@ module Data.AST
   ( AST(..)
   , ArithmeticArgs(..)
   , ComparisionArgs(..)
+  , ListOperatorArgs(..)
   , ValArgs(..)
   ) where
 
 data AST =
     NullAST
-  | ListAST [AST]
   | ArithmeticAST ArithmeticArgs
   | ComparisionAST ComparisionArgs
+  | ListOperatorAST ListOperatorArgs
   | ValAST ValArgs
       deriving Show
 
@@ -27,6 +28,14 @@ data ComparisionArgs =
   | GreaterEqAST [AST]
   | LessEqAST [AST]
   | EqualsAST [AST]
+      deriving Show
+
+data ListOperatorArgs =
+    ConsAST AST AST
+  | ListAST [AST]
+  | CarAST AST
+  | CdrAST AST
+  | IsNullAST AST
       deriving Show
 
 data ValArgs =
