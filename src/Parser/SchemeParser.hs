@@ -1,7 +1,7 @@
 module Parser.SchemeParser
   ( parseScheme ) where
 
-import Data.AST(AST(..), ArithmeticArgs(..), ValArgs(..))
+import Data.AST(AST(..), ArithmeticArgs(..), ComparisionArgs(..), ValArgs(..))
 import Data.ParseTree(ParseTree(..), Exp(..), Symbol(..), Val(..))
 import Parser.BuildInFunctions(isArithmeticFunction)
 import Parser.RoughParser(parseRough)
@@ -31,3 +31,11 @@ createArithmeticAST "*" pt = ArithmeticAST $ MultiplicationAST $ map toAST pt
 createArithmeticAST "/" pt = ArithmeticAST $ DivisionAST $ map toAST pt
 createArithmeticAST "mod" pt = ArithmeticAST $ ModuloAST $ map toAST pt
 createArithmeticAST _ _ = NullAST
+
+createComparisionAST :: String -> [ParseTree] -> AST
+createComparisionAST ">" pt = ComparisionAST $ GreaterAST $ map toAST pt
+createComparisionAST "<" pt = ComparisionAST $ LessAST $ map toAST pt
+createComparisionAST ">=" pt = ComparisionAST $ GreaterEqAST $ map toAST pt
+createComparisionAST "<=" pt = ComparisionAST $ LessEqAST $ map toAST pt
+createComparisionAST "=" pt = ComparisionAST $ EqualsAST $ map toAST pt
+createComparisionAST _ _ = NullAST
