@@ -1,6 +1,7 @@
 module Data.AST
   ( AST(..)
   , ArithmeticArgs(..)
+  , ComparisionArgs(..)
   , ValArgs(..)
   ) where
 
@@ -8,6 +9,7 @@ data AST =
     NullAST
   | ListAST [AST]
   | ArithmeticAST ArithmeticArgs
+  | ComparisionAST ComparisionArgs
   | ValAST ValArgs
       deriving Show
 
@@ -17,6 +19,14 @@ data ArithmeticArgs =
   | MultiplicationAST [AST]
   | DivisionAST [AST]
   | ModuloAST [AST]
+      deriving Show
+
+data ComparisionArgs =
+    GreaterAST [AST]
+  | LessAST [AST]
+  | GreaterEqAST [AST]
+  | LessEqAST [AST]
+  | EqualsAST [AST]
       deriving Show
 
 data ValArgs =
