@@ -47,7 +47,7 @@ isComparisionFunction :: String -> Bool
 isComparisionFunction str = elem str comparisionFunctions
 
 isLogicFunction :: String -> Bool
-isLogicFunctions str = elem str logicFunctions
+isLogicFunction str = elem str logicFunctions
 
 isListOperator :: String -> Bool
 isListOperator str = elem str listOperators
