@@ -20,6 +20,7 @@ createPlainAST :: Exp -> AST
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isArithmeticFunction s = createArithmeticAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isComparisionFunction s = createComparisionAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isListOperator s = createListOperatorAST s args
+createPlainAST (SymbolExp (Variable v)) = ValAST $ VariableAST v
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
 
