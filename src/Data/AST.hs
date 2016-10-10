@@ -12,6 +12,13 @@ data AST =
   | ComparisionAST ComparisionArgs
   | ListOperatorAST ListOperatorArgs
   | ValAST ValArgs
+  | IfAST AST AST AST
+  | CondAST [AST]
+  | ElseAST AST
+  | LetAST AST [AST]
+  | DefineAST AST [AST]
+  | LambdaAST AST [AST]
+  | SetAST AST AST
       deriving Show
 
 data ArithmeticArgs =
