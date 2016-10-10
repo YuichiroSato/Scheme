@@ -14,6 +14,7 @@ parseScheme str = case parseRough str of
 
 toAST :: ParseTree -> AST
 toAST (Plain exp) = createPlainAST exp 
+toAST (Sharp exp) = createSharpAST exp
 toAST (Quote exp) = createQuoteAST exp
 
 createPlainAST :: Exp -> AST
@@ -23,6 +24,9 @@ createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isListOperator s 
 createPlainAST (SymbolExp (Variable v)) = ValAST $ VariableAST v
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
+
+createSharpAST :: Exp -> AST
+createSharpAST (ValExp (BoolVal b)) = ValAST $ BoolAST b
 
 createQuoteAST :: Exp -> AST
 createQuoteAST (Exps ps) = ListOperatorAST $ ListAST (map toAST ps)
