@@ -16,8 +16,8 @@ data AST =
   | CondAST [AST]
   | ElseAST AST
   | LetAST AST [AST]
-  | DefineAST AST [AST]
-  | LambdaAST AST [AST]
+  | DefineAST [AST] [AST]
+  | LambdaAST [AST] [AST]
   | SetAST AST AST
       deriving Show
 
