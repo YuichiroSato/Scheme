@@ -21,6 +21,7 @@ createPlainAST :: Exp -> AST
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isArithmeticFunction s = createArithmeticAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isComparisionFunction s = createComparisionAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isListOperator s = createListOperatorAST s args
+createPlainAST (Exps ((Plain (SymbolExp (Special s))):pt)) = createSpecialFormAST s pt
 createPlainAST (SymbolExp (Variable v)) = ValAST $ VariableAST v
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
@@ -54,3 +55,13 @@ createListOperatorAST "car" (p:[]) = ListOperatorAST $ CarAST $ toAST p
 createListOperatorAST "cdr" (p:[]) = ListOperatorAST $ CdrAST $ toAST p
 createListOperatorAST "null?" (p:[]) = ListOperatorAST $ IsNullAST $ toAST p
 createListOperatorAST _ _ = NullAST
+
+createSpecialFormAST :: String -> [ParseTree] -> AST
+createSpecialFormAST "if" (p1:p2:p3:[]) = IfAST (toAST p1) (toAST p2) (toAST p3)
+--TODO createSpecialFormAST "cond" ((Plain (Exps pt)):[]) = CondAST $ map toAST pt
+--TODO createSpecialFormAST "else" (p:[]) = ElseAST $ toAST p
+--TODO createSpecialFormAST "let" (p:pt) = LetAST (toAST p) (map toAST pt)
+createSpecialFormAST "define" ((Plain (Exps vals)):pt) = DefineAST (map toAST vals) (map toAST pt)
+createSpecialFormAST "lambda" ((Plain (Exps vals)):pt) = LambdaAST (map toAST vals) (map toAST pt)
+createSpecialFormAST "set!" (p1:p2:[]) = SetAST (toAST p1) (toAST p2)
+createSpecialFormAST _ _ = NullAST
