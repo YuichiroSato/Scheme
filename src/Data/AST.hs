@@ -44,4 +44,5 @@ data ValArgs =
   | CharVal Char
   | StringAST String
   | BoolAST Bool
+  | VariableAST String
       deriving Show
