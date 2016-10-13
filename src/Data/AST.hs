@@ -3,6 +3,7 @@ module Data.AST
   , ArithmeticArgs(..)
   , ComparisionArgs(..)
   , ListOperatorArgs(..)
+  , PairAST(..)
   , ValArgs(..)
   ) where
 
@@ -13,9 +14,8 @@ data AST =
   | ListOperatorAST ListOperatorArgs
   | ValAST ValArgs
   | IfAST AST AST AST
-  | CondAST [AST]
-  | ElseAST AST
-  | LetAST AST [AST]
+  | CondAST [PairAST] (Maybe AST)
+  | LetAST [PairAST] [AST]
   | DefineAST [AST] [AST]
   | LambdaAST [AST] [AST]
   | SetAST AST AST
@@ -44,6 +44,8 @@ data ListOperatorArgs =
   | CdrAST AST
   | IsNullAST AST
       deriving Show
+
+data PairAST = PairAST AST AST deriving Show
 
 data ValArgs =
     IntAST Int

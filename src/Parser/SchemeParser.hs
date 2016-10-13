@@ -1,7 +1,8 @@
 module Parser.SchemeParser
   ( parseScheme ) where
 
-import Data.AST(AST(..), ArithmeticArgs(..), ComparisionArgs(..), ListOperatorArgs(..), ValArgs(..))
+import Data.Maybe(fromJust, isJust)
+import Data.AST(AST(..), ArithmeticArgs(..), ComparisionArgs(..), ListOperatorArgs(..), ValArgs(..), PairAST(..))
 import Data.ParseTree(ParseTree(..), Exp(..), Symbol(..), Val(..))
 import Parser.BuildInFunctions(isArithmeticFunction, isComparisionFunction, isListOperator)
 import Parser.RoughParser(parseRough)
@@ -58,10 +59,34 @@ createListOperatorAST _ _ = NullAST
 
 createSpecialFormAST :: String -> [ParseTree] -> AST
 createSpecialFormAST "if" (p1:p2:p3:[]) = IfAST (toAST p1) (toAST p2) (toAST p3)
---TODO createSpecialFormAST "cond" ((Plain (Exps pt)):[]) = CondAST $ map toAST pt
---TODO createSpecialFormAST "else" (p:[]) = ElseAST $ toAST p
---TODO createSpecialFormAST "let" (p:pt) = LetAST (toAST p) (map toAST pt)
+createSpecialFormAST "cond" pt = createCondAST pt
+createSpecialFormAST "let" ((Plain (Exps pt1)):pt2) = createLetAST pt1 pt2
 createSpecialFormAST "define" ((Plain (Exps vals)):pt) = DefineAST (map toAST vals) (map toAST pt)
 createSpecialFormAST "lambda" ((Plain (Exps vals)):pt) = LambdaAST (map toAST vals) (map toAST pt)
 createSpecialFormAST "set!" (p1:p2:[]) = SetAST (toAST p1) (toAST p2)
 createSpecialFormAST _ _ = NullAST
+
+-- TODO: else
+createCondAST :: [ParseTree] -> AST
+createCondAST pt = makeCondAST $ foldJust $ maybePairs pt
+  where
+    makeCondAST (Just pp) = CondAST pp Nothing
+    makeCondAST _ = NullAST
+
+createLetAST :: [ParseTree] -> [ParseTree] -> AST
+createLetAST p1 p2 = makeLetAST (foldJust $ maybePairs p1) (map toAST p2)
+  where
+    makeLetAST (Just v) b = LetAST v b
+    makeLetAST _ _ = NullAST
+
+foldJust :: [Maybe PairAST] -> Maybe [PairAST]
+foldJust ps = if all isJust ps
+                then Just $ map fromJust ps
+                else Nothing
+
+maybePairs :: [ParseTree] -> [Maybe PairAST]
+maybePairs = map createPairAST
+
+createPairAST :: ParseTree -> Maybe PairAST
+createPairAST (Plain (Exps (p1:p2:[]))) = Just $ PairAST (toAST p1) (toAST p2)
+createPairAST _ = Nothing
