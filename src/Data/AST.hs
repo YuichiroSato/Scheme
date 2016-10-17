@@ -15,6 +15,7 @@ data AST =
   | ValAST ValArgs
   | IfAST AST AST AST
   | CondAST [PairAST] (Maybe AST)
+  | ElseAST AST
   | LetAST [PairAST] [AST]
   | DefineAST [AST] [AST]
   | LambdaAST [AST] [AST]

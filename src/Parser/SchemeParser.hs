@@ -26,6 +26,7 @@ createPlainAST (Exps ((Plain (SymbolExp (Special s))):pt)) = createSpecialFormAS
 createPlainAST (SymbolExp (Variable v)) = ValAST $ VariableAST v
 createPlainAST (ValExp (IntVal i)) = ValAST $ IntAST i
 createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
+createPlainAST _ = NullAST
 
 createSharpAST :: Exp -> AST
 createSharpAST (ValExp (BoolVal b)) = ValAST $ BoolAST b
@@ -60,6 +61,7 @@ createListOperatorAST _ _ = NullAST
 createSpecialFormAST :: String -> [ParseTree] -> AST
 createSpecialFormAST "if" (p1:p2:p3:[]) = IfAST (toAST p1) (toAST p2) (toAST p3)
 createSpecialFormAST "cond" pt = createCondAST pt
+createSpecialFormAST "else" (p:[]) = ElseAST $ toAST p
 createSpecialFormAST "let" ((Plain (Exps pt1)):pt2) = createLetAST pt1 pt2
 createSpecialFormAST "define" ((Plain (Exps vals)):pt) = DefineAST (map toAST vals) (map toAST pt)
 createSpecialFormAST "lambda" ((Plain (Exps vals)):pt) = LambdaAST (map toAST vals) (map toAST pt)
@@ -68,25 +70,40 @@ createSpecialFormAST _ _ = NullAST
 
 -- TODO: else
 createCondAST :: [ParseTree] -> AST
-createCondAST pt = makeCondAST $ foldJust $ maybePairs pt
+createCondAST (p:[]) = case createPairAST p of
+                         Just a -> CondAST [a] Nothing
+                         Nothing -> case toAST p of
+                                      ElseAST a -> CondAST [] (Just a)
+                                      NullAST -> NullAST
+createCondAST pt = makeCondAST $ sequence $ maybePairs pairParseTrees
   where
-    makeCondAST (Just pp) = CondAST pp Nothing
+    makeCondAST (Just pp) = CondAST pp elseAST
     makeCondAST _ = NullAST
+    pairParseTrees = case elseAST of
+                       Nothing -> pt
+                       _ -> reverse $ tail $ reverse pt
+    elseAST = createElseAST pt
+
+createElseAST :: [ParseTree] -> Maybe AST
+createElseAST pt = case (createPairAST $ last pt) of
+                     Just pair -> Nothing
+                     Nothing -> case (toAST $ last pt) of
+                                  ElseAST a -> Just a
+                                  _ -> Nothing
 
 createLetAST :: [ParseTree] -> [ParseTree] -> AST
-createLetAST p1 p2 = makeLetAST (foldJust $ maybePairs p1) (map toAST p2)
+createLetAST p1 p2 = makeLetAST (sequence $ maybePairs p1) (map toAST p2)
   where
     makeLetAST (Just v) b = LetAST v b
     makeLetAST _ _ = NullAST
-
-foldJust :: [Maybe PairAST] -> Maybe [PairAST]
-foldJust ps = if all isJust ps
-                then Just $ map fromJust ps
-                else Nothing
 
 maybePairs :: [ParseTree] -> [Maybe PairAST]
 maybePairs = map createPairAST
 
 createPairAST :: ParseTree -> Maybe PairAST
-createPairAST (Plain (Exps (p1:p2:[]))) = Just $ PairAST (toAST p1) (toAST p2)
+createPairAST (Plain (Exps (p1:p2:[]))) = case (toAST p1, toAST p2) of
+                                            (NullAST, NullAST) -> Nothing
+                                            (NullAST, _) -> Nothing
+                                            (_, NullAST) -> Nothing
+                                            (l, r) -> Just $ PairAST l r
 createPairAST _ = Nothing
