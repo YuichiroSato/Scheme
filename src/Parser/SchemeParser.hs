@@ -29,6 +29,8 @@ createPlainAST (ValExp (DoubleVal d)) = ValAST $ DoubleAST d
 createPlainAST _ = NullAST
 
 createSharpAST :: Exp -> AST
+createSharpAST (SymbolExp (Variable "t")) = ValAST $ BoolAST True
+createSharpAST (SymbolExp (Variable "f")) = ValAST $ BoolAST False
 createSharpAST (ValExp (BoolVal b)) = ValAST $ BoolAST b
 
 createQuoteAST :: Exp -> AST
