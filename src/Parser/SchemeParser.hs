@@ -2,9 +2,9 @@ module Parser.SchemeParser
   ( parseScheme ) where
 
 import Data.Maybe(fromJust, isJust)
-import Data.AST(AST(..), ArithmeticArgs(..), ComparisionArgs(..), ListOperatorArgs(..), ValArgs(..), PairAST(..))
+import Data.AST(AST(..), ArithmeticArgs(..), ComparisionArgs(..), LogicArgs(..), ListOperatorArgs(..), ValArgs(..), PairAST(..))
 import Data.ParseTree(ParseTree(..), Exp(..), Symbol(..), Val(..))
-import Parser.BuildInFunctions(isArithmeticFunction, isComparisionFunction, isListOperator)
+import Parser.BuildInFunctions(isArithmeticFunction, isComparisionFunction, isLogicFunction, isListOperator)
 import Parser.RoughParser(parseRough)
 import Text.Parsec(ParseError)
 
@@ -21,6 +21,7 @@ toAST (Quote exp) = createQuoteAST exp
 createPlainAST :: Exp -> AST
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isArithmeticFunction s = createArithmeticAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isComparisionFunction s = createComparisionAST s args
+createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isLogicFunction s = createLogicAST s args
 createPlainAST (Exps ((Plain (SymbolExp (BuildIn s))):args)) | isListOperator s = createListOperatorAST s args
 createPlainAST (Exps ((Plain (SymbolExp (Special s))):pt)) = createSpecialFormAST s pt
 createPlainAST (SymbolExp (Variable v)) = ValAST $ VariableAST v
@@ -51,6 +52,13 @@ createComparisionAST ">=" pt = ComparisionAST $ GreaterEqAST $ map toAST pt
 createComparisionAST "<=" pt = ComparisionAST $ LessEqAST $ map toAST pt
 createComparisionAST "=" pt = ComparisionAST $ EqualsAST $ map toAST pt
 createComparisionAST _ _ = NullAST
+
+createLogicAST :: String -> [ParseTree] -> AST
+createLogicAST "and" pt = LogicAST $ AndAST $ map toAST pt
+createLogicAST "or" pt = LogicAST $ OrAST $ map toAST pt
+createLogicAST "not" (p:[]) = LogicAST $ NotAST $ toAST p
+createLogicAST "eq" pt = LogicAST $ EqAST $ map toAST pt
+createLogicAST _ _ = NullAST
 
 createListOperatorAST :: String -> [ParseTree] -> AST
 createListOperatorAST "cons" (p1:p2:[]) = ListOperatorAST $ ConsAST (toAST p1) (toAST p2)

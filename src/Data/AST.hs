@@ -2,6 +2,7 @@ module Data.AST
   ( AST(..)
   , ArithmeticArgs(..)
   , ComparisionArgs(..)
+  , LogicArgs(..)
   , ListOperatorArgs(..)
   , PairAST(..)
   , ValArgs(..)
@@ -11,6 +12,7 @@ data AST =
     NullAST
   | ArithmeticAST ArithmeticArgs
   | ComparisionAST ComparisionArgs
+  | LogicAST LogicArgs
   | ListOperatorAST ListOperatorArgs
   | ValAST ValArgs
   | IfAST AST AST AST
@@ -37,6 +39,13 @@ data ComparisionArgs =
   | LessEqAST [AST]
   | EqualsAST [AST]
       deriving Show
+
+data LogicArgs =
+    AndAST [AST]
+  | OrAST [AST]
+  | NotAST AST
+  | EqAST [AST]
+     deriving Show
 
 data ListOperatorArgs =
     ConsAST AST AST
